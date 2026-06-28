@@ -2,6 +2,14 @@
 name = "ryoiki"
 version = "0.1.0"
 edition = "2024"
+description = "Jujutsu (jj) ワークスペースを管理する CLI ツール — 領域展開"
+license = "MIT"
+repository = "https://github.com/UtakataKyosui/ryoiki"
+homepage = "https://github.com/UtakataKyosui/ryoiki"
+readme = "README.md"
+keywords = ["jujutsu", "jj", "workspace", "cli", "vcs"]
+categories = ["command-line-utilities", "development-tools"]
+exclude = [".github/", "SPEC.md"]
 
 [[bin]]
 name = "ryoiki"
