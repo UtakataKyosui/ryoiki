@@ -21,6 +21,24 @@
 cargo install ryoiki
 ```
 
+## AI エージェント向け AgentSkill
+
+`ryoiki` は AI コーディングエージェントが安全にワークスペースを操作するための AgentSkill を提供します。GitHub CLI の `gh skill` コマンドでインストールできます。
+
+```bash
+# スキルをインストール
+gh skill install UtakataKyosui/ryoiki ryoiki --agent codex --scope project
+
+# インストール前にプレビュー
+gh skill preview UtakataKyosui/ryoiki ryoiki
+
+# スキルを更新
+gh skill update ryoiki
+```
+
+> [!NOTE]
+> `gh skill` は GitHub CLI のプレビュー機能です。AgentSkill はエージェントに `ryoiki` CLI の使い方を教えるものであり、`ryoiki` バイナリ自体はインストールしません。
+
 ## シェル統合
 
 ```bash
