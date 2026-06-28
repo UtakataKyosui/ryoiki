@@ -1,6 +1,6 @@
 use clap::Args;
 
-use crate::{config::Config, output::Printer};
+use crate::{config::Config, jj, output::Printer};
 
 #[derive(Debug, Args)]
 pub struct RenameArgs {
@@ -12,10 +12,17 @@ pub struct RenameArgs {
 }
 
 pub fn run(
-    _args: &RenameArgs,
+    args: &RenameArgs,
     _config: &Config,
-    _printer: &Printer,
-    _repo_root: &std::path::Path,
+    printer: &Printer,
+    repo_root: &std::path::Path,
 ) -> anyhow::Result<()> {
-    todo!("rename command not yet implemented")
+    jj::workspace_rename(repo_root, &args.old_name, &args.new_name)?;
+
+    printer.success(&format!(
+        "Domain \"{}\" renamed to \"{}\".",
+        args.old_name, args.new_name
+    ));
+
+    Ok(())
 }
