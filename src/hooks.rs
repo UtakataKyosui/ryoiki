@@ -41,13 +41,13 @@ impl<'a> HookRunner<'a> {
     fn discover(&self, hook_name: &str) -> Vec<PathBuf> {
         let mut scripts = Vec::new();
 
-        // 1. Repo-local hooks
+        // 1. Repo-local hooks first
         let local_hook = self.repo_root.join(".ryoiki").join("hooks").join(hook_name);
         if local_hook.exists() {
             scripts.push(local_hook);
         }
 
-        // 2. Global hooks
+        // 2. Global hooks second
         let global_hook = self.config.global_hook_dir().join(hook_name);
         if global_hook.exists() {
             scripts.push(global_hook);
@@ -80,7 +80,10 @@ impl<'a> HookRunner<'a> {
             match self.config.hooks.on_failure.as_str() {
                 "abort" => return Err(err.into()),
                 "warn" => {
-                    eprintln!("warning: hook \"{}\" exited with non-zero status", ctx.hook_name);
+                    eprintln!(
+                        "warning: hook \"{}\" exited with non-zero status",
+                        ctx.hook_name
+                    );
                 }
                 _ => {} // ignore
             }
