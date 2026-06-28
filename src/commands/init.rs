@@ -12,19 +12,15 @@ pub struct InitArgs {
     pub hook_key: Option<String>,
 }
 
-pub fn run(
-    args: &InitArgs,
-    _config: &Config,
-    _printer: &Printer,
-) -> anyhow::Result<()> {
+pub fn run(args: &InitArgs, _config: &Config, _printer: &Printer) -> anyhow::Result<()> {
     match args.shell.as_str() {
         "bash" => emit_bash(args.hook_key.as_deref()),
         "zsh" => emit_zsh(args.hook_key.as_deref()),
         "fish" => emit_fish(args.hook_key.as_deref()),
         "nushell" | "nu" => emit_nushell(),
-        other => anyhow::bail!(
-            "unsupported shell \"{other}\". Supported: bash, zsh, fish, nushell"
-        ),
+        other => {
+            anyhow::bail!("unsupported shell \"{other}\". Supported: bash, zsh, fish, nushell")
+        }
     }
 
     Ok(())

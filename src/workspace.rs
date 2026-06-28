@@ -67,10 +67,10 @@ impl WorkspaceInfo {
 
     pub fn display_path(&self) -> String {
         // Try to abbreviate home directory
-        if let Some(home) = dirs::home_dir() {
-            if let Ok(rel) = self.path.strip_prefix(&home) {
-                return format!("~/{}", rel.display());
-            }
+        if let Some(home) = dirs::home_dir()
+            && let Ok(rel) = self.path.strip_prefix(&home)
+        {
+            return format!("~/{}", rel.display());
         }
         self.path.display().to_string()
     }
@@ -84,11 +84,7 @@ impl WorkspaceInfo {
     }
 
     pub fn status_str(&self) -> &'static str {
-        if self.is_stale {
-            "stale"
-        } else {
-            "active"
-        }
+        if self.is_stale { "stale" } else { "active" }
     }
 }
 

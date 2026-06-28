@@ -6,7 +6,7 @@ use crate::{
     error::RyoikiError,
     hooks::{HookContext, HookRunner},
     jj,
-    output::{emit_cd, Printer},
+    output::{Printer, emit_cd},
     workspace::WorkspaceInfo,
 };
 
@@ -77,15 +77,20 @@ pub fn run(
         destination.display()
     ));
 
-    jj::workspace_add(repo_root, &args.name, &destination, args.revision.as_deref())
-        .map_err(|e| {
-            let msg = e.to_string();
-            if msg.contains("already exists") {
-                anyhow::Error::from(RyoikiError::WorkspaceExists(args.name.clone()))
-            } else {
-                e
-            }
-        })?;
+    jj::workspace_add(
+        repo_root,
+        &args.name,
+        &destination,
+        args.revision.as_deref(),
+    )
+    .map_err(|e| {
+        let msg = e.to_string();
+        if msg.contains("already exists") {
+            anyhow::Error::from(RyoikiError::WorkspaceExists(args.name.clone()))
+        } else {
+            e
+        }
+    })?;
 
     printer.success(&format!(
         "Domain \"{}\" expanded at {}",

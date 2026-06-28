@@ -71,10 +71,7 @@ pub fn run(
     for ws in targets {
         // Cannot collapse current workspace
         if ws.is_current {
-            printer.error(&format!(
-                "Cannot collapse current domain \"{}\".",
-                ws.name
-            ));
+            printer.error(&format!("Cannot collapse current domain \"{}\".", ws.name));
             printer.hint("Enter another domain first with `ryoiki enter <name>`.");
             return Err(RyoikiError::CannotCollapseCurrentDomain(ws.name.clone()).into());
         }
@@ -107,9 +104,8 @@ pub fn run(
 
         // 3. Remove directory unless --keep-dir
         if !args.keep_dir && ws.path.exists() {
-            std::fs::remove_dir_all(&ws.path).map_err(|e| {
-                anyhow::anyhow!("failed to remove {}: {}", ws.path.display(), e)
-            })?;
+            std::fs::remove_dir_all(&ws.path)
+                .map_err(|e| anyhow::anyhow!("failed to remove {}: {}", ws.path.display(), e))?;
         }
 
         // 4. zoxide remove (failure is just a warning)
@@ -117,13 +113,10 @@ pub fn run(
             let result = Command::new("zoxide")
                 .args(["remove", &ws.path.to_string_lossy()])
                 .status();
-            if let Ok(s) = result {
-                if !s.success() {
-                    printer.warning(&format!(
-                        "zoxide remove failed for {}",
-                        ws.path.display()
-                    ));
-                }
+            if let Ok(s) = result
+                && !s.success()
+            {
+                printer.warning(&format!("zoxide remove failed for {}", ws.path.display()));
             }
         }
 

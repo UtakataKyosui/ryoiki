@@ -26,7 +26,11 @@ pub fn run(
         }
 
         if let Some(desc) = &ws.description {
-            let d = if desc.is_empty() { "(empty)" } else { desc.as_str() };
+            let d = if desc.is_empty() {
+                "(empty)"
+            } else {
+                desc.as_str()
+            };
             println!("Description:    {d}");
         }
     } else {
@@ -43,7 +47,12 @@ pub fn run(
             } else {
                 "active".to_owned()
             };
-            println!("  {:<20} {:<40} {}", name, printer.path_text(&ws.display_path()), status);
+            println!(
+                "  {:<20} {:<40} {}",
+                name,
+                printer.path_text(&ws.display_path()),
+                status
+            );
         }
     }
 

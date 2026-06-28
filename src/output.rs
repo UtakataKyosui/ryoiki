@@ -96,7 +96,7 @@ impl Printer {
         }
     }
 
-    pub fn domain_name<'a>(&self, name: &'a str, is_current: bool) -> String {
+    pub fn domain_name(&self, name: &str, is_current: bool) -> String {
         if !self.color {
             return name.to_owned();
         }
@@ -107,7 +107,7 @@ impl Printer {
         }
     }
 
-    pub fn stale_text<'a>(&self, text: &'a str) -> String {
+    pub fn stale_text(&self, text: &str) -> String {
         if self.color {
             text.yellow().to_string()
         } else {
@@ -115,7 +115,7 @@ impl Printer {
         }
     }
 
-    pub fn path_text<'a>(&self, text: &'a str) -> String {
+    pub fn path_text(&self, text: &str) -> String {
         if self.color {
             text.blue().dimmed().to_string()
         } else {
@@ -123,7 +123,7 @@ impl Printer {
         }
     }
 
-    pub fn change_id_text<'a>(&self, text: &'a str) -> String {
+    pub fn change_id_text(&self, text: &str) -> String {
         if self.color {
             text.magenta().to_string()
         } else {
@@ -132,7 +132,7 @@ impl Printer {
     }
 
     #[allow(dead_code)]
-    pub fn dim<'a>(&self, text: &'a str) -> String {
+    pub fn dim(&self, text: &str) -> String {
         if self.color {
             text.dimmed().to_string()
         } else {

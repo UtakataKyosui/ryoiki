@@ -91,10 +91,7 @@ pub fn parse_workspace_list(raw: &str) -> Vec<(String, Option<PathBuf>, bool)> {
 
 /// Get the short change ID and description for a workspace revision.
 /// Returns None if the workspace is stale or the query fails.
-pub fn workspace_change_info(
-    repo_root: &Path,
-    workspace_name: &str,
-) -> Option<(String, String)> {
+pub fn workspace_change_info(repo_root: &Path, workspace_name: &str) -> Option<(String, String)> {
     let revset = format!("@{}", workspace_name);
     let template = "change_id.short(8) ++ \"\\t\" ++ description.first_line() ++ \"\\n\"";
 

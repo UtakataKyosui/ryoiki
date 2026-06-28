@@ -99,7 +99,13 @@ fn print_table(workspaces: &[WorkspaceInfo], printer: &Printer) {
             Cell::new(ws.status_str())
         };
 
-        table.add_row(vec![name_cell, path_cell, change_cell, desc_cell, status_cell]);
+        table.add_row(vec![
+            name_cell,
+            path_cell,
+            change_cell,
+            desc_cell,
+            status_cell,
+        ]);
     }
 
     println!("{table}");

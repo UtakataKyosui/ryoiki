@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(default)]
 pub struct Config {
     pub core: CoreConfig,
@@ -60,19 +60,6 @@ pub struct HooksConfig {
     pub hook_dir: Option<String>,
     pub timeout_seconds: u64,
     pub on_failure: String,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            core: CoreConfig::default(),
-            list: ListConfig::default(),
-            fzf: FzfConfig::default(),
-            tmux: TmuxConfig::default(),
-            zoxide: ZoxideConfig::default(),
-            hooks: HooksConfig::default(),
-        }
-    }
 }
 
 impl Default for CoreConfig {
@@ -318,12 +305,18 @@ mod tests {
 
     #[test]
     fn expand_tilde_absolute_path() {
-        assert_eq!(expand_tilde("/usr/local/bin"), PathBuf::from("/usr/local/bin"));
+        assert_eq!(
+            expand_tilde("/usr/local/bin"),
+            PathBuf::from("/usr/local/bin")
+        );
     }
 
     #[test]
     fn expand_tilde_relative_path() {
-        assert_eq!(expand_tilde("relative/path"), PathBuf::from("relative/path"));
+        assert_eq!(
+            expand_tilde("relative/path"),
+            PathBuf::from("relative/path")
+        );
     }
 
     #[test]

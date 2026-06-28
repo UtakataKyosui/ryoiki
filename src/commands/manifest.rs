@@ -2,13 +2,7 @@ use clap::Args;
 use std::path::Path;
 use std::process::Command;
 
-use crate::{
-    config::Config,
-    error::RyoikiError,
-    jj,
-    output::Printer,
-    workspace::WorkspaceInfo,
-};
+use crate::{config::Config, error::RyoikiError, jj, output::Printer, workspace::WorkspaceInfo};
 
 #[derive(Debug, Args)]
 pub struct ManifestArgs {
@@ -46,12 +40,10 @@ pub fn run(
     }
 
     let repo_name = jj::repo_name(repo_root);
-    let session_name = args.session.clone().unwrap_or_else(|| {
-        config
-            .tmux
-            .session_format
-            .replace("{repo}", &repo_name)
-    });
+    let session_name = args
+        .session
+        .clone()
+        .unwrap_or_else(|| config.tmux.session_format.replace("{repo}", &repo_name));
 
     let layout = args
         .layout
@@ -81,7 +73,10 @@ pub fn run(
         .unwrap_or(false);
 
     if session_exists && config.tmux.auto_attach {
-        printer.println(&format!("Session \"{}\" already exists, attaching…", session_name));
+        printer.println(&format!(
+            "Session \"{}\" already exists, attaching…",
+            session_name
+        ));
         if !args.no_attach {
             Command::new("tmux")
                 .args(["attach-session", "-t", &session_name])
@@ -107,7 +102,12 @@ pub fn run(
     if args.window_per_domain {
         // Rename first window to first workspace name
         Command::new("tmux")
-            .args(["rename-window", "-t", &format!("{}:0", session_name), &first.name])
+            .args([
+                "rename-window",
+                "-t",
+                &format!("{}:0", session_name),
+                &first.name,
+            ])
             .status()?;
 
         // Create a window per remaining workspace

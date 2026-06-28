@@ -8,7 +8,7 @@ use crate::{
     error::RyoikiError,
     hooks::{HookContext, HookRunner},
     jj,
-    output::{emit_cd, Printer},
+    output::{Printer, emit_cd},
     workspace::WorkspaceInfo,
 };
 
@@ -117,7 +117,9 @@ fn resolve_target<'a>(
 
     // No name given
     if args.no_fzf || !config.fzf.enabled {
-        anyhow::bail!("workspace name required (fzf is disabled, use --no-fzf=false or provide NAME)");
+        anyhow::bail!(
+            "workspace name required (fzf is disabled, use --no-fzf=false or provide NAME)"
+        );
     }
 
     fzf_select(workspaces, config)
@@ -166,12 +168,7 @@ fn fzf_select<'a>(
     }
 
     let selected = String::from_utf8_lossy(&output.stdout);
-    let selected_name = selected
-        .split('\t')
-        .next()
-        .unwrap_or("")
-        .trim()
-        .to_owned();
+    let selected_name = selected.split('\t').next().unwrap_or("").trim().to_owned();
 
     workspaces
         .iter()
