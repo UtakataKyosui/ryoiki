@@ -21,7 +21,8 @@ pub fn run(cwd: &Path, args: &[&str]) -> Result<String> {
     Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
-/// Run a jj subcommand, returning (stdout, success).  Stderr is swallowed.
+/// Run a jj subcommand, stderr swallowed.
+#[allow(dead_code)]
 pub fn run_silent(cwd: &Path, args: &[&str]) -> Result<String> {
     let output = Command::new("jj")
         .args(args)

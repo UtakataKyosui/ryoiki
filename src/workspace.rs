@@ -48,6 +48,7 @@ impl WorkspaceInfo {
 
     /// Find the current workspace by checking which workspace path is an ancestor
     /// of (or equal to) the cwd.
+    #[allow(dead_code)]
     pub fn detect_current(workspaces: &mut [WorkspaceInfo], cwd: &Path) {
         // Clear existing is_current (trust jj's output first)
         // If none is marked current, try path comparison.

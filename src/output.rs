@@ -47,6 +47,7 @@ impl Printer {
         }
     }
 
+    #[allow(dead_code)]
     pub fn eprintln(&self, msg: &str) {
         eprintln!("{msg}");
     }
@@ -130,6 +131,7 @@ impl Printer {
         }
     }
 
+    #[allow(dead_code)]
     pub fn dim<'a>(&self, text: &'a str) -> String {
         if self.color {
             text.dimmed().to_string()
