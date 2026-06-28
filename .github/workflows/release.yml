@@ -190,7 +190,6 @@ jobs:
     name: Publish to crates.io
     needs: release
     runs-on: ubuntu-latest
-    environment: crates-io  # GitHub Environment でトークンを管理
     steps:
       - uses: actions/checkout@v4
 
