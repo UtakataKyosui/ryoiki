@@ -90,3 +90,71 @@ impl WorkspaceInfo {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make(name: &str, path: &str, is_current: bool, is_stale: bool) -> WorkspaceInfo {
+        WorkspaceInfo {
+            name: name.to_owned(),
+            path: PathBuf::from(path),
+            change_id: None,
+            description: None,
+            is_current,
+            is_stale,
+        }
+    }
+
+    #[test]
+    fn status_str_active() {
+        assert_eq!(make("main", "/repo", false, false).status_str(), "active");
+    }
+
+    #[test]
+    fn status_str_stale() {
+        assert_eq!(make("old", "/repo", false, true).status_str(), "stale");
+    }
+
+    #[test]
+    fn display_name_current_with_marker() {
+        let ws = make("main", "/repo", true, false);
+        assert_eq!(ws.display_name(true), "main (current)");
+    }
+
+    #[test]
+    fn display_name_current_without_marker() {
+        let ws = make("main", "/repo", true, false);
+        assert_eq!(ws.display_name(false), "main");
+    }
+
+    #[test]
+    fn display_name_non_current() {
+        let ws = make("feature", "/repo", false, false);
+        // Even with show_current_marker=true, non-current should not get the suffix
+        assert_eq!(ws.display_name(true), "feature");
+    }
+
+    #[test]
+    fn detect_current_falls_back_to_path() {
+        let mut workspaces = vec![
+            make("main", "/repo", false, false),
+            make("feature", "/repo-feature", false, false),
+        ];
+        WorkspaceInfo::detect_current(&mut workspaces, Path::new("/repo-feature/src"));
+        assert!(workspaces[1].is_current);
+        assert!(!workspaces[0].is_current);
+    }
+
+    #[test]
+    fn detect_current_skips_when_already_marked() {
+        let mut workspaces = vec![
+            make("main", "/repo", true, false),
+            make("feature", "/repo-feature", false, false),
+        ];
+        // Should not change anything since one is already marked current
+        WorkspaceInfo::detect_current(&mut workspaces, Path::new("/repo-feature"));
+        assert!(workspaces[0].is_current);
+        assert!(!workspaces[1].is_current);
+    }
+}

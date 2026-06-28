@@ -153,3 +153,65 @@ pub fn workspace_rename(repo_root: &Path, old: &str, new: &str) -> Result<()> {
     run(repo_root, &["workspace", "rename", old, new])?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_basic() {
+        let raw = "main: /home/user/repo\nfeature: /home/user/repo-feature (current)\n";
+        let ws = parse_workspace_list(raw);
+        assert_eq!(ws.len(), 2);
+        assert_eq!(ws[0].0, "main");
+        assert_eq!(ws[0].1, Some(PathBuf::from("/home/user/repo")));
+        assert!(!ws[0].2, "main should not be current");
+        assert_eq!(ws[1].0, "feature");
+        assert_eq!(ws[1].1, Some(PathBuf::from("/home/user/repo-feature")));
+        assert!(ws[1].2, "feature should be current");
+    }
+
+    #[test]
+    fn parse_stale() {
+        let raw = "old: (stale)\n";
+        let ws = parse_workspace_list(raw);
+        assert_eq!(ws.len(), 1);
+        assert_eq!(ws[0].0, "old");
+        assert_eq!(ws[0].1, None, "stale workspace should have no path");
+        assert!(!ws[0].2);
+    }
+
+    #[test]
+    fn parse_empty() {
+        assert!(parse_workspace_list("").is_empty());
+        assert!(parse_workspace_list("  \n\n  ").is_empty());
+    }
+
+    #[test]
+    fn parse_single_current() {
+        let raw = "default: /repo (current)";
+        let ws = parse_workspace_list(raw);
+        assert_eq!(ws.len(), 1);
+        assert_eq!(ws[0].0, "default");
+        assert_eq!(ws[0].1, Some(PathBuf::from("/repo")));
+        assert!(ws[0].2);
+    }
+
+    #[test]
+    fn parse_ignores_lines_without_colon() {
+        let raw = "no-colon-here\nmain: /repo\n";
+        let ws = parse_workspace_list(raw);
+        assert_eq!(ws.len(), 1);
+        assert_eq!(ws[0].0, "main");
+    }
+
+    #[test]
+    fn parse_path_with_colon() {
+        // Paths like C:\Users\... on Windows — split only on first ':'
+        let raw = "default: C:\\Users\\user\\repo (current)";
+        let ws = parse_workspace_list(raw);
+        assert_eq!(ws.len(), 1);
+        assert_eq!(ws[0].1, Some(PathBuf::from("C:\\Users\\user\\repo")));
+        assert!(ws[0].2);
+    }
+}

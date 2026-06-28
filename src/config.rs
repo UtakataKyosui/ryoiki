@@ -299,3 +299,108 @@ pub fn expand_tilde(path: &str) -> PathBuf {
         PathBuf::from(path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn expand_tilde_home_subdir() {
+        let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("/home/user"));
+        assert_eq!(expand_tilde("~/foo/bar"), home.join("foo/bar"));
+    }
+
+    #[test]
+    fn expand_tilde_alone() {
+        let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("/home/user"));
+        assert_eq!(expand_tilde("~"), home);
+    }
+
+    #[test]
+    fn expand_tilde_absolute_path() {
+        assert_eq!(expand_tilde("/usr/local/bin"), PathBuf::from("/usr/local/bin"));
+    }
+
+    #[test]
+    fn expand_tilde_relative_path() {
+        assert_eq!(expand_tilde("relative/path"), PathBuf::from("relative/path"));
+    }
+
+    #[test]
+    fn default_core_config() {
+        let c = CoreConfig::default();
+        assert_eq!(c.dir_format, "{repo}-{name}");
+        assert_eq!(c.color, "auto");
+        assert!(c.show_status_on_enter);
+        assert!(c.base_dir.is_none());
+    }
+
+    #[test]
+    fn default_list_config() {
+        let c = ListConfig::default();
+        assert_eq!(c.format, "table");
+        assert!(!c.show_stale);
+        assert!(c.columns.contains(&"name".to_owned()));
+        assert!(c.columns.contains(&"status".to_owned()));
+    }
+
+    #[test]
+    fn default_hooks_config() {
+        let c = HooksConfig::default();
+        assert!(c.enabled);
+        assert_eq!(c.on_failure, "warn");
+        assert_eq!(c.timeout_seconds, 30);
+        assert!(c.hook_dir.is_none());
+    }
+
+    #[test]
+    fn default_fzf_config() {
+        let c = FzfConfig::default();
+        assert!(c.enabled);
+        assert!(c.preview);
+    }
+
+    #[test]
+    fn default_zoxide_config() {
+        assert!(ZoxideConfig::default().enabled);
+    }
+
+    #[test]
+    fn merge_prefers_local_dir_format() {
+        let mut global = Config::default();
+        global.core.dir_format = "global-{name}".to_owned();
+        let mut local = Config::default();
+        local.core.dir_format = "local-{name}".to_owned();
+        let merged = Config::merge(global, local);
+        assert_eq!(merged.core.dir_format, "local-{name}");
+    }
+
+    #[test]
+    fn merge_falls_back_to_global_dir_format() {
+        let mut global = Config::default();
+        global.core.dir_format = "global-{name}".to_owned();
+        let local = Config::default(); // dir_format == default
+        let merged = Config::merge(global, local);
+        assert_eq!(merged.core.dir_format, "global-{name}");
+    }
+
+    #[test]
+    fn merge_combines_base_dir() {
+        let mut global = Config::default();
+        global.core.base_dir = Some("~/global".to_owned());
+        let mut local = Config::default();
+        local.core.base_dir = Some("./local".to_owned());
+        let merged = Config::merge(global, local);
+        // local wins
+        assert_eq!(merged.core.base_dir, Some("./local".to_owned()));
+    }
+
+    #[test]
+    fn merge_base_dir_falls_back_to_global() {
+        let mut global = Config::default();
+        global.core.base_dir = Some("~/global".to_owned());
+        let local = Config::default(); // base_dir == None
+        let merged = Config::merge(global, local);
+        assert_eq!(merged.core.base_dir, Some("~/global".to_owned()));
+    }
+}
