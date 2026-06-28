@@ -1,13 +1,18 @@
 use clap::Args;
+use std::path::Path;
 
-use crate::{config::Config, output::Printer};
+use crate::{
+    commands::expand::{ExpandArgs, run as expand_run},
+    config::Config,
+    output::Printer,
+};
 
 #[derive(Debug, Args)]
 pub struct ForgeArgs {
     /// ワークスペース名
     pub name: String,
 
-    /// 作成先パス
+    /// 作成先パス (省略時: <base_dir>/<dir_format>)
     pub destination: Option<std::path::PathBuf>,
 
     /// 作業コピーコミットの親リビジョン
@@ -32,10 +37,22 @@ pub struct ForgeArgs {
 }
 
 pub fn run(
-    _args: &ForgeArgs,
-    _config: &Config,
-    _printer: &Printer,
-    _repo_root: &std::path::Path,
+    args: &ForgeArgs,
+    config: &Config,
+    printer: &Printer,
+    repo_root: &Path,
 ) -> anyhow::Result<()> {
-    todo!("forge command not yet implemented")
+    // forge = expand --no-cd (no shell output)
+    let expand_args = ExpandArgs {
+        name: args.name.clone(),
+        destination: args.destination.clone(),
+        revision: args.revision.clone(),
+        message: args.message.clone(),
+        sparse: args.sparse.clone(),
+        no_cd: true,
+        no_hooks: args.no_hooks,
+        base_dir: args.base_dir.clone(),
+    };
+
+    expand_run(&expand_args, config, printer, repo_root, false)
 }
