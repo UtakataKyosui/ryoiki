@@ -2,7 +2,7 @@ use clap::Args;
 use std::path::{Path, PathBuf};
 
 use crate::{
-    config::{expand_tilde, Config},
+    config::Config,
     error::RyoikiError,
     hooks::{HookContext, HookRunner},
     jj,

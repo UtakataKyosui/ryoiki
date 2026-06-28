@@ -19,6 +19,7 @@ use output::{ColorMode, Printer};
 fn main() {
     let cli = Cli::parse();
 
+    // --no-color flag takes priority; config color is applied after config is loaded.
     let color_mode = if cli.no_color {
         ColorMode::Never
     } else {
@@ -31,17 +32,17 @@ fn main() {
         Ok(()) => {}
         Err(e) => {
             if let Some(re) = e.downcast_ref::<RyoikiError>() {
-                printer.error(&e.to_string());
+                printer.error(&format!("{e}"));
                 std::process::exit(re.exit_code());
             } else {
-                printer.error(&e.to_string());
+                printer.error(&format!("{e}"));
                 std::process::exit(1);
             }
         }
     }
 }
 
-fn run(cli: &Cli, printer: &Printer) -> Result<()> {
+fn run(cli: &Cli, _printer: &Printer) -> Result<()> {
     let cwd = std::env::current_dir()?;
     let repo_root = if let Some(repo) = &cli.repository {
         repo.clone()
@@ -60,8 +61,18 @@ fn run(cli: &Cli, printer: &Printer) -> Result<()> {
 
     let config = Config::load(
         cli.config.as_deref(),
-        Some(&repo_root).filter(|p| !p.as_os_str().is_empty()).map(|p| p.as_path()),
+        Some(&repo_root)
+            .filter(|p| !p.as_os_str().is_empty())
+            .map(|p| p.as_path()),
     )?;
+
+    // Re-build a printer that respects config color if --no-color wasn't given.
+    let effective_color = if cli.no_color {
+        ColorMode::Never
+    } else {
+        ColorMode::from_str(&config.core.color)
+    };
+    let printer = &Printer::new(effective_color, cli.quiet, cli.verbose);
 
     match &cli.command {
         Commands::List(args) => commands::list::run(args, &config, printer, &repo_root),
