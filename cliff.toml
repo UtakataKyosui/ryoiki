@@ -18,7 +18,7 @@ body = """
 {% for commit in commits %}
 - {% if commit.scope %}**{{ commit.scope }}**: {% endif %}\
 {{ commit.message | upper_first }} \
-([`{{ commit.id | truncate(length=7, end="") }}`]({{ remote.url }}/commit/{{ commit.id }}))\
+([`{{ commit.id | truncate(length=7, end="") }}`](https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}/commit/{{ commit.id }}))\
 {% endfor %}
 {% endfor %}\n
 """
